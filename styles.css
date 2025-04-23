@@ -1,0 +1,138 @@
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.registration-card, .login-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.wallet-logo {
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.btn-group .btn {
+    flex: 1;
+}
+
+.password-strength .progress {
+    height: 5px;
+}
+
+.password-strength .progress-bar {
+    transition: width 0.3s ease;
+}
+
+.verification-code-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.verification-code {
+    width: 40px;
+    height: 50px;
+    text-align: center;
+    font-size: 24px;
+    margin: 0 5px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+}
+
+.verification-code:focus {
+    border-color: #0d6efd;
+    outline: none;
+}
+
+#qrCodeContainer {
+    min-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#qrCode {
+    width: 200px;
+    height: 200px;
+}
+
+.chat-container {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+}
+
+.chat-input {
+    display: flex;
+}
+
+.chat-input input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    max-width: 80%;
+}
+
+.message.received {
+    background-color: #e9ecef;
+    align-self: flex-start;
+}
+
+.message.sent {
+    background-color: #0d6efd;
+    color: white;
+    align-self: flex-end;
+}
+
+#generateQRBtn {
+    padding: 15px 30px;
+    font-size: 18px;
+}
+
+#journeyStatus {
+    font-size: 16px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .registration-card, .login-card {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .verification-code {
+        width: 30px;
+        height: 40px;
+        font-size: 18px;
+    }
+}

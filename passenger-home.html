@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passenger Dashboard | City Bus</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Custom styles matching your original design */
+        #qrCodeContainer {
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .chat-container {
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+        
+        .message.received {
+            background-color: #e9ecef;
+            align-self: flex-start;
+        }
+        
+        .message.sent {
+            background-color: #0d6efd;
+            color: white;
+            align-self: flex-end;
+        }
+        
+        .chat-input {
+            display: flex;
+        }
+        
+        #generateQRBtn {
+            padding: 15px 30px;
+            font-size: 18px;
+        }
+        
+        #journeyStatus {
+            font-size: 16px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        /* Makes QR code and button stack vertically */
+        #qrCodeContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center horizontally */
+            gap: 15px; /* Space between QR and button */
+        }
+
+        /* Optional: Style adjustments */
+        #endJourneyBtn {
+            width: 200px; /* Match QR code width */
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">City Bus</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <button class="btn btn-outline-light" id="logoutBtn">Logout</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- QR Code Section -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4><i class="fas fa-qrcode me-2"></i> Generate Journey QR Code</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div id="qrCodeContainer">
+                            <button id="generateQRBtn" class="btn btn-primary btn-lg">
+                                <i class="fas fa-qrcode me-2"></i> Generate QR Code
+                            </button>
+                        </div>
+                        <div id="journeyStatus" class="mt-3">
+                            Press the button to start your journey
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <!-- Help Chat -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4><i class="fas fa-comments me-2"></i> 24/7 Help Center</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="chat-container">
+                            <div class="chat-messages" id="chatMessages">
+                                <div class="message received">
+                                    <p>Hello! How can I help you today?</p>
+                                </div>
+                            </div>
+                            <div class="chat-input">
+                                <input type="text" class="form-control" id="chatInput" placeholder="Type your message...">
+                                <button class="btn btn-primary" id="sendChatBtn">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Main Application Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Check login status
+            if (!localStorage.getItem('isLoggedIn')) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // 2. QR Code System
+            const qrCodeContainer = document.getElementById('qrCodeContainer');
+            const generateQRBtn = document.getElementById('generateQRBtn');
+            const journeyStatus = document.getElementById('journeyStatus');
+            let currentQRCode = null;
+            
+            generateQRBtn.addEventListener('click', function() {
+                // Clear previous QR code
+                qrCodeContainer.innerHTML = '';
+                
+                // Generate random journey ID
+                const journeyId = 'JRN-' + Math.floor(100000 + Math.random() * 900000);
+                const userMobile = localStorage.getItem('userMobile') || '12345678';
+                
+                // Create QR data
+                const qrData = JSON.stringify({
+                    userId: userMobile,
+                    journeyId: journeyId,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Generate new QR code
+                currentQRCode = new QRCode(qrCodeContainer, {
+                    text: qrData,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                // Update status
+                journeyStatus.textContent = 'Journey started. Show this QR code to the driver.';
+                journeyStatus.className = 'mt-3 text-success';
+                
+                // Create End Journey button
+                const endJourneyBtn = document.createElement('button');
+                endJourneyBtn.id = 'endJourneyBtn';
+                endJourneyBtn.className = 'btn btn-danger btn-lg mt-3';
+                endJourneyBtn.innerHTML = '<i class="fas fa-stop-circle me-2"></i> End Journey';
+                endJourneyBtn.addEventListener('click', endJourney);
+                
+                qrCodeContainer.appendChild(endJourneyBtn);
+            });
+            
+            function endJourney() {
+                // Clear everything
+                qrCodeContainer.innerHTML = '';
+                
+                // Recreate Generate button
+                const generateBtn = document.createElement('button');
+                generateBtn.id = 'generateQRBtn';
+                generateBtn.className = 'btn btn-primary btn-lg';
+                generateBtn.innerHTML = '<i class="fas fa-qrcode me-2"></i> Generate New QR';
+                generateBtn.addEventListener('click', generateQRCode);
+                
+                qrCodeContainer.appendChild(generateBtn);
+                
+                // Update status
+                journeyStatus.textContent = 'Journey completed - fare deducted';
+                journeyStatus.className = 'mt-3 text-primary';
+            }
+            
+            // 3. Chat System
+            const chatInput = document.getElementById('chatInput');
+            const sendChatBtn = document.getElementById('sendChatBtn');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    // Add user message
+                    addMessage(message, 'sent');
+                    chatInput.value = '';
+                    
+                    // Simulate reply after 1 second
+                    setTimeout(() => {
+                        const replies = [
+                            "How can I assist you further?",
+                            "Your issue has been noted.",
+                            "Thank you for your message!",
+                            "For immediate help, call 12345."
+                        ];
+                        const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                        addMessage(randomReply, 'received');
+                    }, 1000);
+                }
+            }
+            
+            function addMessage(text, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.innerHTML = `<p>${text}</p>`;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            sendChatBtn.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+            
+            // 4. Logout
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('isLoggedIn');
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>
