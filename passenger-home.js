@@ -1,34 +1,45 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Check login status
-    if (!localStorage.getItem('isLoggedIn')) {
-        window.location.href = 'index.html';
-        return;
-    }
-    
-    // 2. Get DOM elements
+document.addEventListener('DOMContentLoaded', function () {
+    console.log("JS Loaded");
+
+    // 1. Get DOM elements
     const qrCodeContainer = document.getElementById('qrCodeContainer');
     const journeyStatus = document.getElementById('journeyStatus');
-    
-    // 3. Initialize with Generate QR button
-    setupGenerateButton();
-    
+
+    // 2. Store the original Generate QR button HTML
+    const originalGenerateBtnHTML = `
+        <button id="generateQRBtn" class="btn btn-primary btn-lg">
+            <i class="fas fa-qrcode me-2"></i> Generate QR Code
+        </button>
+    `;
+
+    // 3. Reset to initial state function
+    function resetToInitialState() {
+        qrCodeContainer.innerHTML = originalGenerateBtnHTML;
+        const generateQRBtn = document.getElementById('generateQRBtn');
+        if (generateQRBtn) {
+            generateQRBtn.addEventListener('click', generateQRCode);
+        }
+        journeyStatus.textContent = 'Press the button to start your journey';
+        journeyStatus.className = 'mt-3 text-muted';
+    }
+
     // 4. Generate QR Code function
     function generateQRCode() {
         // Clear container
         qrCodeContainer.innerHTML = '';
-        
+
         // Generate random journey ID
         const journeyId = 'JRN-' + Math.floor(100000 + Math.random() * 900000);
         const userMobile = localStorage.getItem('userMobile') || '12345678';
-        
-        // Create QR data
+
+        // QR data
         const qrData = JSON.stringify({
             userId: userMobile,
             journeyId: journeyId,
             timestamp: new Date().toISOString()
         });
-        
-        // Generate QR code
+
+        // Create QR code
         new QRCode(qrCodeContainer, {
             text: qrData,
             width: 200,
@@ -37,66 +48,42 @@ document.addEventListener('DOMContentLoaded', function() {
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
         });
-        
-        // Create End Journey button
+
+        // Add End Journey button
         const endJourneyBtn = document.createElement('button');
         endJourneyBtn.id = 'endJourneyBtn';
         endJourneyBtn.className = 'btn btn-danger btn-lg mt-3';
         endJourneyBtn.innerHTML = '<i class="fas fa-stop-circle me-2"></i> End Journey';
-        
-        // Add to container
-        qrCodeContainer.appendChild(endJourneyBtn);
-        
-        // Update status
-        journeyStatus.textContent = 'Journey started. Show this QR code to the driver.';
-        journeyStatus.className = 'mt-3 text-success';
-        
-        // Add click handler
         endJourneyBtn.addEventListener('click', endJourney);
+
+        qrCodeContainer.appendChild(endJourneyBtn);
+
+        // Update journey status
+        journeyStatus.textContent = 'Journey started. Show QR to driver.';
+        journeyStatus.className = 'mt-3 text-success';
     }
-    
+
     // 5. End Journey function
     function endJourney() {
-        // Clear container
-        qrCodeContainer.innerHTML = '';
-        
-        // Update status
-        journeyStatus.textContent = 'Journey completed - fare deducted';
+        resetToInitialState();
+        journeyStatus.textContent = 'Journey completed. Fare deducted.';
         journeyStatus.className = 'mt-3 text-primary';
-        
-        // Recreate Generate button
-        setupGenerateButton();
     }
-    
-    // 6. Setup Generate Button (reusable function)
-    function setupGenerateButton() {
-        // Clear container
-        qrCodeContainer.innerHTML = '';
-        
-        // Create new button
-        const generateBtn = document.createElement('button');
-        generateBtn.id = 'generateQRBtn';
-        generateBtn.className = 'btn btn-primary btn-lg';
-        generateBtn.innerHTML = '<i class="fas fa-qrcode me-2"></i> Generate QR Code';
-        
-        // Add to container
-        qrCodeContainer.appendChild(generateBtn);
-        
-        // Add click handler
-        generateBtn.addEventListener('click', generateQRCode);
-    }
-    
-    // 7. Chat System (unchanged)
+
+    // 6. Initialize the page
+    resetToInitialState();
+
+    // 7. Chat System
     const chatInput = document.getElementById('chatInput');
     const sendChatBtn = document.getElementById('sendChatBtn');
     const chatMessages = document.getElementById('chatMessages');
-    
+
     function sendMessage() {
         const message = chatInput.value.trim();
         if (message) {
             addMessage(message, 'sent');
             chatInput.value = '';
-            
+
             setTimeout(() => {
                 const replies = [
                     "How can I assist you further?",
@@ -109,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         }
     }
-    
+
     function addMessage(text, type) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${type}`;
@@ -117,14 +104,14 @@ document.addEventListener('DOMContentLoaded', function() {
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-    
+
     sendChatBtn.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', function(e) {
+    chatInput.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') sendMessage();
     });
-    
+
     // 8. Logout
-    document.getElementById('logoutBtn').addEventListener('click', function() {
+    document.getElementById('logoutBtn').addEventListener('click', function () {
         localStorage.removeItem('isLoggedIn');
         window.location.href = 'index.html';
     });
