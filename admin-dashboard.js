@@ -1,139 +1,151 @@
+import { getDashboardData } from './supabase.js';
 
-<!-- admin-dashboard.js -->
-// Dashboard control script
+let revenueChart;
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Authentication check
+document.addEventListener('DOMContentLoaded', async () => {
   if (!localStorage.getItem('isAdmin')) {
     window.location.href = 'index.html';
     return;
   }
 
-  // Logout button
-  document.getElementById('adminLogoutBtn').addEventListener('click', function() {
+  document.getElementById('adminLogoutBtn').addEventListener('click', () => {
     localStorage.removeItem('isAdmin');
     window.location.href = 'index.html';
   });
 
-  // Initialize empty chart
-  initDashboardChart([]);
+  try {
+    document.getElementById('kpiPassengers').textContent = '...';
+    document.getElementById('kpiViolations').textContent = '...';
+    document.getElementById('transactionsTableBody').innerHTML = '<tr><td colspan="3" class="text-center">Loading...</td></tr>';
+    document.getElementById('violationsTableBody').innerHTML = '<tr><td colspan="3" class="text-center">Loading...</td></tr>';
 
-  // Fetch filter options (e.g., routes)
-  // fetchRoutes().then(populateRouteOptions);
-
-  // Generate report button
-  document.getElementById('generateReportBtn').addEventListener('click', () => {
-    const type = document.getElementById('reportTypeSelect').value;
-    // Backend dev: trigger report generation API and update lastReportRun
-  });
-
-  // Apply filters button
-  document.getElementById('applyFiltersBtn').addEventListener('click', () => {
-    const start = document.getElementById('filterDateStart').value;
-    const end   = document.getElementById('filterDateEnd').value;
-    const route = document.getElementById('filterRoute').value;
-    // Example: fetchDashboardData({ start, end, route }).then(updateDashboard);
-  });
+    const data = await getDashboardData();
+    updateDashboard(data);
+  } catch (error) {
+    console.error('Dashboard initialization failed:', error);
+    document.getElementById('transactionsTableBody').innerHTML = '<tr><td colspan="3" class="text-center text-danger">Failed to load data</td></tr>';
+    document.getElementById('violationsTableBody').innerHTML = '<tr><td colspan="3" class="text-center text-danger">Failed to load data</td></tr>';
+  }
 });
 
-/**
- * Initializes the Chart.js line chart in the #dashboardChart canvas.
- * @param {Array<{label: string, value: number}>} data
- */
-function initDashboardChart(data) {
-  const ctx = document.getElementById('dashboardChart').getContext('2d');
-  window.dashboardChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: data.map(d => d.label),
-      datasets: [{
-        label: 'Revenue (BDT)',
-        data: data.map(d => d.value),
-        fill: false,
-        tension: 0.1
-      }]
-    },
-    options: {
-      scales: {
-        x: { display: true },
-        y: { display: true, beginAtZero: true }
-      }
-    }
-  });
+function updateDashboard(data) {
+  console.log('Dashboard data:', data);
+
+  document.getElementById('kpiPassengers').textContent = data.kpis.passengers;
+  document.getElementById('kpiJourneys').textContent = data.kpis.journeys;
+  document.getElementById('kpiRevenue').textContent = data.kpis.revenue;
+  document.getElementById('kpiViolations').textContent = data.kpis.violations;
+
+  updateRevenueChart(data.chartData);
+
+  const transactionsBody = document.getElementById('transactionsTableBody');
+  if (data.recentTransactions.length > 0) {
+    transactionsBody.innerHTML = data.recentTransactions.map(t => `
+      <tr>
+        <td>${t.passengers?.name || 'Unknown'}</td>
+        <td>${parseFloat(t.amount).toFixed(2)} BDT</td>
+        <td>${new Date(t.created_at).toLocaleString()}</td>
+      </tr>
+    `).join('');
+  } else {
+    transactionsBody.innerHTML = '<tr><td colspan="3" class="text-center">No transactions found</td></tr>';
+  }
+
+  const violationsBody = document.getElementById('violationsTableBody');
+  if (data.recentViolations.length > 0) {
+    violationsBody.innerHTML = data.recentViolations.map(v => {
+      const busRoute = v.buses?.route || 'Unknown route';
+      
+      return `
+        <tr>
+          <td>${new Date(v.created_at).toLocaleString()}</td>
+          <td>${busRoute}</td>
+          <td>
+            <span class="badge ${getViolationBadgeClass(v.type)}">
+              ${v.type}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } else {
+    violationsBody.innerHTML = '<tr><td colspan="3" class="text-center">No violations found</td></tr>';
+  }
 }
 
-/**
- * Update all parts of the dashboard with fetched data
- * @param {Object} payload
- * @param {Object} payload.kpis
- * @param {Array}  payload.chartData
- * @param {Array}  payload.violations
- * @param {Array}  payload.complaints
- * @param {Object} payload.occupancy {loaded, capacity}
- * @param {Array}  payload.transactions
- */
-function updateDashboard({ kpis, chartData, violations, complaints, occupancy, transactions }) {
-  // KPIs
-  document.getElementById('kpiPassengers').textContent = kpis.passengers;
-  document.getElementById('kpiJourneys').textContent   = kpis.journeys;
-  document.getElementById('kpiRevenue').textContent    = kpis.revenue;
-  document.getElementById('kpiViolations').textContent = kpis.violations;
-  document.getElementById('kpiComplaints').textContent = kpis.complaints;
-  document.getElementById('kpiScore').textContent      = kpis.compliance + '%';
+function getViolationBadgeClass(type) {
+  const classes = {
+    noScan: 'bg-danger',
+    fakeScan: 'bg-warning text-dark',
+    incorrectCode: 'bg-info text-dark',
+    multipleAttempts: 'bg-secondary'
+  };
+  return classes[type] || 'bg-primary';
+}
 
-  // Occupancy
-  const { loaded, capacity } = occupancy;
-  const pct = capacity > 0 ? Math.round((loaded / capacity) * 100) : 0;
-  document.getElementById('occupancyText').textContent = `${loaded}/${capacity}`;
-  const bar = document.getElementById('occupancyBar');
-  bar.style.width = pct + '%';
-  bar.setAttribute('aria-valuenow', pct);
+function updateRevenueChart(chartData) {
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+    if (revenueChart) {
+    revenueChart.destroy();
+  }
 
-  // Chart
-  window.dashboardChart.data.labels = chartData.map(d => d.label);
-  window.dashboardChart.data.datasets[0].data = chartData.map(d => d.value);
-  window.dashboardChart.update();
-
-  // Transactions table
-  const ttBody = document.querySelector('#transactionsTable tbody');
-  ttBody.innerHTML = '';
-  transactions.forEach(t => {
-    ttBody.insertAdjacentHTML('beforeend', `
-      <tr>
-        <td>${t.tripId}</td>
-        <td>${t.passenger}</td>
-        <td>${t.distance}</td>
-        <td>${t.fare}</td>
-        <td>${t.timestamp}</td>
-      </tr>
-    `);
-  });
-
-  // Violations table
-  const vtBody = document.querySelector('#violationsTable tbody');
-  vtBody.innerHTML = '';
-  violations.forEach(v => {
-    vtBody.insertAdjacentHTML('beforeend', `
-      <tr>
-        <td>${v.timestamp}</td>
-        <td>${v.busId}</td>
-        <td>${v.location}</td>
-        <td>${v.type}</td>
-      </tr>
-    `);
-  });
-
-  // Complaints table
-  const ctBody = document.querySelector('#complaintsTable tbody');
-  ctBody.innerHTML = '';
-  complaints.forEach(c => {
-    ctBody.insertAdjacentHTML('beforeend', `
-      <tr>
-        <td>${c.id}</td>
-        <td>${c.category}</td>
-        <td>${c.status}</td>
-        <td>${c.date}</td>
-      </tr>
-    `);
-  });
+  if (chartData.length > 0) {
+    revenueChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartData.map(item => item.date),
+        datasets: [{
+          label: 'Daily Revenue (BDT)',
+          data: chartData.map(item => item.amount),
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 2,
+          tension: 0.1,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        animation: {
+          duration: 1000,
+          easing: 'easeInOutQuad'
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            title: {
+              display: true,
+              text: 'Revenue (BDT)'
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Date'
+            },
+            grid: {
+              display: false
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                return `Revenue: ${context.parsed.y.toFixed(2)} BDT`;
+              }
+            }
+          }
+        }
+      }
+    });
+  } else {
+    document.getElementById('revenueChart').style.display = 'none';
+    document.querySelector('.card-header').insertAdjacentHTML('afterend', 
+      '<div class="alert alert-warning m-3">No revenue data available</div>'
+    );
+  }
 }
