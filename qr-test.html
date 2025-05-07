@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>QR Code Test</title>
-    <!-- REQUIRED LIBRARY -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <style>
         #qrContainer {
@@ -15,24 +14,22 @@
             justify-content: center;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js" type="module"></script>
 </head>
 <body>
-    <!-- SIMPLE TEST INTERFACE -->
     <h1>QR Code Generator Test</h1>
     <button id="generateBtn">Generate Test QR</button>
     <div id="qrContainer">QR will appear here</div>
     <p id="status">Click the button above</p>
 
-    <!-- DEBUGGING SCRIPT -->
     <script>
         document.getElementById('generateBtn').addEventListener('click', function() {
             try {
                 console.log("Attempting QR generation...");
                 
-                // Clear previous
                 document.getElementById('qrContainer').innerHTML = '';
                 
-                // Generate with simple text
                 new QRCode(document.getElementById('qrContainer'), {
                     text: "WORKING-TEST-" + Math.random().toString(36).substring(2, 8),
                     width: 200,
@@ -50,4 +47,3 @@
     </script>
 </body>
 </html>
-<!-- CSE307 -->

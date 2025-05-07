@@ -1,271 +1,119 @@
-<!-- admin-dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>City Bus - Admin Dashboard</title>
-
-  <!-- Bootstrap & Font‑Awesome -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet"/>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
-  <link rel="stylesheet" href="css/styles.css"/>
-
-  <!-- Chart.js CDN -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | City Bus</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
-      <a class="navbar-brand" href="admin-dashboard.html">Admin Dashboard</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="adminNavbar">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link active" href="admin-dashboard.html">Dashboard</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="passengers.html">Passengers</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="buses.html">Buses</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="reports.html">Reports</a>
-          </li>
-        </ul>
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <button class="btn btn-outline-light" id="adminLogoutBtn">Logout</button>
-          </li>
-        </ul>
-      </div>
+      <a class="navbar-brand" href="#">City Bus Admin</a>
+      <button class="btn btn-outline-light" id="adminLogoutBtn">Logout</button>
     </div>
   </nav>
 
   <div class="container mt-4">
-
-
-    <!-- Filter Controls -->
-    <div class="row mb-4 align-items-end">
+    <div class="row mb-4">
       <div class="col-md-3">
-        <label for="filterDateStart" class="form-label">From</label>
-        <input type="date" id="filterDateStart" class="form-control">
-      </div>
-      <div class="col-md-3">
-        <label for="filterDateEnd" class="form-label">To</label>
-        <input type="date" id="filterDateEnd" class="form-control">
-      </div>
-      <div class="col-md-3">
-        <label for="filterRoute" class="form-label">Route</label>
-        <select id="filterRoute" class="form-select">
-          <option value="">All Routes</option>
-          <!-- backend will populate -->
-        </select>
-      </div>
-      <div class="col-md-2">
-        <label class="form-label">&nbsp;</label>
-        <button id="applyFiltersBtn" class="btn btn-primary w-100">Apply Filters</button>
-      </div>
-    </div>
-
-    <!-- Summary cards -->
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card text-white bg-success mb-3">
-          <div class="card-body">
+        <div class="card text-white bg-success">
+          <div class="card-body text-center">
             <h5 class="card-title">Total Passengers</h5>
-            <p id="kpiPassengers" class="card-text display-4">1,245</p>
+            <p id="kpiPassengers" class="card-text display-4 mb-0">0</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card text-white bg-info mb-3">
-          <div class="card-body">
+      <div class="col-md-3">
+        <div class="card text-white bg-info">
+          <div class="card-body text-center">
             <h5 class="card-title">Active Journeys</h5>
-            <p id="kpiJourneys" class="card-text display-4">87</p>
+            <p id="kpiJourneys" class="card-text display-4 mb-0">0</p>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card text-white bg-warning mb-3">
-          <div class="card-body">
+      <div class="col-md-3">
+        <div class="card text-white bg-warning">
+          <div class="card-body text-center">
             <h5 class="card-title">Today's Revenue</h5>
-            <p id="kpiRevenue" class="card-text display-4">৳24,580</p>
+            <p id="kpiRevenue" class="card-text display-4 mb-0">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-danger">
+          <div class="card-body text-center">
+            <h5 class="card-title">Violations Today</h5>
+            <p id="kpiViolations" class="card-text display-4 mb-0">0</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Additional KPI cards -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Revenue Analytics</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="revenueChart" height="100"></canvas>
+      </div>
+    </div>
+
     <div class="row">
-      <div class="col-md-3">
-        <div class="card text-white bg-danger mb-3">
-          <div class="card-body">
-            <h5 class="card-title">QR Violations Today</h5>
-            <p id="kpiViolations" class="card-text display-4">0</p>
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Recent Transactions</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Passenger</th>
+                    <th>Amount</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionsTableBody">
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-3">
-        <div class="card text-white bg-dark mb-3">
-          <div class="card-body">
-            <h5 class="card-title">Open Complaints</h5>
-            <p id="kpiComplaints" class="card-text display-4">0</p>
+
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Recent Violations</h5>
           </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card text-white bg-secondary mb-3">
-          <div class="card-body">
-            <h5 class="card-title">Compliance Score</h5>
-            <p id="kpiScore" class="card-text display-4">--%</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card mb-3">
-          <div class="card-body">
-            <h5 class="card-title">Current Occupancy</h5>
-            <p class="mb-1"><span id="occupancyText">0/0</span> passengers</p>
-            <div class="progress">
-              <div id="occupancyBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Bus</th>
+                    <th>Type</th>
+                  </tr>
+                </thead>
+                <tbody id="violationsTableBody">
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Revenue Chart -->
-    <div class="row mt-4">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header bg-secondary text-white">
-            <h5 class="mb-0">Revenue Over Time</h5>
-          </div>
-          <div class="card-body">
-            <canvas id="dashboardChart" height="100"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Transactions Table -->
-    <div class="row mt-4">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">Recent Fare Transactions</h5>
-          </div>
-          <div class="card-body p-0">
-            <table id="transactionsTable" class="table mb-0">
-              <thead>
-                <tr>
-                  <th>Trip ID</th>
-                  <th>Passenger</th>
-                  <th>Distance (km)</th>
-                  <th>Fare (BDT)</th>
-                  <th>Timestamp</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- populated dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Violations Log Table -->
-    <div class="row mt-4">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">QR Violations Log</h5>
-          </div>
-          <div class="card-body p-0">
-            <table id="violationsTable" class="table mb-0">
-              <thead>
-                <tr>
-                  <th>Timestamp</th>
-                  <th>Bus ID</th>
-                  <th>Location</th>
-                  <th>Type</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- populated dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Audits Findings Table -->
-    <div class="row mt-4">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">Fare Audit Findings</h5>
-          </div>
-          <div class="card-body p-0">
-            <table id="auditsTable" class="table mb-0">
-              <thead>
-                <tr>
-                  <th>Trip ID</th>
-                  <th>Expected Fare (BDT)</th>
-                  <th>Charged Fare (BDT)</th>
-                  <th>Difference</th>
-                  <th>Timestamp</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- populated dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Complaints Dashboard Table -->"
-    <div class="row mt-4 mb-5">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">Passenger Complaints</h5>
-          </div>
-          <div class="card-body p-0">
-            <table id="complaintsTable" class="table mb-0">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Complaints</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- populated dynamically -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
-  <!-- Bootstrap Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Dashboard logic -->
-  <script src="admin-dashboard.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase.js" type="module"></script>
+  <script src="./admin-dashboard.js" type="module"></script>
 </body>
 </html>
-<!-- CSE307 -->

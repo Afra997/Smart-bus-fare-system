@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify Your Account | City Bus</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    <link rel="stylesheet" href="styles.css"/>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js" type="module"></script>
     <style>
         body {
             background-color: #f8f9fa;
@@ -25,7 +27,6 @@
             border-radius: 10px 10px 0 0 !important;
         }
         
-        /* Verification code input styling */
         .verification-code-container {
             display: flex;
             justify-content: center;
@@ -49,7 +50,6 @@
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
         }
         
-        /* Responsive adjustments */
         @media (max-width: 576px) {
             .verification-code {
                 width: 40px;
@@ -62,7 +62,6 @@
             }
         }
         
-        /* Button styling */
         .btn-verify {
             padding: 10px 25px;
             font-size: 18px;
@@ -80,7 +79,6 @@
                     <div class="card-body p-4">
                         <p class="text-center mb-4">We've sent a 6-digit code to your mobile number. Please enter it below:</p>
                         
-                        <!-- Verification Code Input -->
                         <div class="verification-code-container">
                             <input type="text" class="verification-code" maxlength="1" data-index="1" autofocus>
                             <input type="text" class="verification-code" maxlength="1" data-index="2">
@@ -91,7 +89,6 @@
                         </div>
                         <input type="hidden" id="fullVerificationCode">
                         
-                        <!-- Action Buttons -->
                         <div class="d-flex justify-content-between mt-4">
                             <button type="button" class="btn btn-outline-secondary" id="backBtn">
                                 <i class="fas fa-arrow-left me-2"></i>Back
@@ -110,23 +107,17 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Verification Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Generate and store verification code (for demo)
             const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             document.getElementById('fullVerificationCode').value = verificationCode;
             console.log('Demo Verification Code:', verificationCode); // For testing
             
-            // Get all verification inputs
             const verificationInputs = document.querySelectorAll('.verification-code');
             
-            // Auto-focus and input handling
             verificationInputs.forEach((input, index) => {
-                // Handle input
                 input.addEventListener('input', function() {
                     if (this.value.length === 1) {
                         if (index < verificationInputs.length - 1) {
@@ -135,7 +126,6 @@
                     }
                 });
                 
-                // Handle backspace
                 input.addEventListener('keydown', function(e) {
                     if (e.key === 'Backspace' && this.value.length === 0) {
                         if (index > 0) {
@@ -145,7 +135,6 @@
                 });
             });
             
-            // Verify button click handler
             document.getElementById('verifyBtn').addEventListener('click', function() {
                 let enteredCode = '';
                 verificationInputs.forEach(input => {
@@ -154,32 +143,33 @@
                 
                 if (enteredCode === document.getElementById('fullVerificationCode').value) {
                     alert('Verification successful! Redirecting...');
-                    window.location.href = 'passenger-home.html'; // Change to your success page
+                    window.location.href = 'passenger-home.html';
                 } else {
                     alert('Invalid verification code. Please try again.');
                     verificationInputs[0].focus();
                 }
             });
             
-            // Back button
             document.getElementById('backBtn').addEventListener('click', function() {
-                window.location.href = 'registration.html'; // Change to your previous page
+                window.location.href = 'registration.html';
             });
             
-            // Resend code
             document.getElementById('resendCode').addEventListener('click', function(e) {
                 e.preventDefault();
                 const newCode = Math.floor(100000 + Math.random() * 900000).toString();
                 document.getElementById('fullVerificationCode').value = newCode;
-                console.log('New code sent:', newCode); // For testing
+                console.log('New code sent:', newCode);
                 alert('New verification code sent!');
                 
-                // Clear inputs and refocus
                 verificationInputs.forEach(input => input.value = '');
                 verificationInputs[0].focus();
             });
         });
     </script>
+<link rel="stylesheet" href="./css/styles.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase.js" type="module"></script>
+<script src="./admin-dashboard.js" type="module"></script>
 </body>
 </html>
-<!-- CSE307 -->

@@ -1,4 +1,3 @@
-<!-- buses.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bus Fleet Management | City Bus Admin</title>
 
-  <!-- Bootstrap & FontAwesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
-  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js" type="module"></script>
 </head>
 <body>
-  <!-- Nav (same as other admin pages) -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
       <a class="navbar-brand" href="admin-dashboard.html">Admin Dashboard</a>
@@ -41,7 +40,6 @@
       <button class="btn btn-primary" id="addBusBtn"><i class="fas fa-plus me-2"></i>New Bus</button>
     </div>
 
-    <!-- Filters -->
     <div class="row mb-3">
       <div class="col-md-4">
         <input type="search" id="busSearch" class="form-control" placeholder="Search by Bus ID or Route">
@@ -49,7 +47,6 @@
       <div class="col-md-3">
         <select id="routeFilter" class="form-select">
           <option value="">All Routes</option>
-          <!-- dynamic -->
         </select>
       </div>
       <div class="col-md-3">
@@ -64,7 +61,6 @@
       </div>
     </div>
 
-    <!-- Buses Table -->
     <div class="card">
       <div class="card-body p-0">
         <table id="busesTable" class="table table-hover mb-0">
@@ -81,7 +77,6 @@
             </tr>
           </thead>
           <tbody>
-            <!-- populated dynamically -->
           </tbody>
         </table>
       </div>
@@ -89,12 +84,10 @@
 
   </div>
 
-  <!-- Modals (Add/Edit Bus) -->
-  <!-- Add your modal HTML here -->
-
-  <!-- Bootstrap & Script -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="buses.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" type="module"></script>
+<link rel="stylesheet" href="./css/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase.js" type="module"></script>
+<script src="./admin-dashboard.js" type="module"></script>
 </body>
 </html>
-<!-- CSE307 -->
