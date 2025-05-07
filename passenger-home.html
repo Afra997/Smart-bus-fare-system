@@ -1,4 +1,4 @@
-<!-- passenger-home.html (updated with Violation submit button) -->
+<!-- passenger-home.html (with Violation Types dropdown) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,23 +68,22 @@
         </div>
     </nav>
 
-    <!-- Balance & Violation Reporting -->
+    <!-- Balance Bar -->
     <div class="container mt-3">
       <div class="card mb-4">
         <div class="card-body text-center">
           <h5 class="mb-0">Current Balance: <span id="currentBalance">-- BDT</span></h5>
         </div>
       </div>
+      <!-- Violation Types Dropdown -->
       <div class="card mb-4">
-        <div class="card-body d-flex align-items-center gap-3">
-          <label for="violationTypeSelect" class="mb-0">Report Violation:</label>
+        <div class="card-body d-flex align-items-center">
+          <label for="violationTypeSelect" class="me-2 mb-0">Report Violation:</label>
           <select id="violationTypeSelect" class="form-select" style="width: 250px;">
             <option value="">Select Violation Type</option>
             <option value="noScan">No QR Scan</option>
-            <option value="fakeScan">Fake QR Scan</option>
             <option value="incorrectCode">Incorrect QR Code</option>
           </select>
-          <button id="reportViolationBtn" class="btn btn-danger">Submit</button>
         </div>
       </div>
     </div>
