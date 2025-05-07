@@ -7,8 +7,10 @@
   <title>City Bus - Admin Dashboard</title>
 
   <!-- Bootstrap & Font‑Awesome -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"/>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
   <link rel="stylesheet" href="css/styles.css"/>
 
   <!-- Chart.js CDN -->
@@ -23,8 +25,18 @@
       </button>
       <div class="collapse navbar-collapse" id="adminNavbar">
         <ul class="navbar-nav me-auto">
-          <li class="nav-item"><a class="nav-link active" href="admin-dashboard.html">Dashboard</a></li>
-          <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
+          <li class="nav-item">
+            <a class="nav-link active" href="admin-dashboard.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="passengers.html">Passengers</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="buses.html">Buses</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="reports.html">Reports</a>
+          </li>
         </ul>
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
@@ -36,8 +48,10 @@
   </nav>
 
   <div class="container mt-4">
-    <!-- Filter Controls (Backend: modify fields as needed) -->
-    <div id="filterSection" class="row mb-4 gx-3 gy-2 align-items-end">
+
+
+    <!-- Filter Controls -->
+    <div class="row mb-4 align-items-end">
       <div class="col-md-3">
         <label for="filterDateStart" class="form-label">From</label>
         <input type="date" id="filterDateStart" class="form-control">
@@ -50,64 +64,84 @@
         <label for="filterRoute" class="form-label">Route</label>
         <select id="filterRoute" class="form-select">
           <option value="">All Routes</option>
-          <!-- Backend: populate route options here -->
+          <!-- backend will populate -->
         </select>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
+        <label class="form-label">&nbsp;</label>
         <button id="applyFiltersBtn" class="btn btn-primary w-100">Apply Filters</button>
       </div>
     </div>
 
-    <!-- Summary Cards (Backend: update KPI values) -->
-    <div id="kpiSummary" class="row g-4">
+    <!-- Summary cards -->
+    <div class="row">
       <div class="col-md-4">
-        <div class="card text-white bg-success h-100">
-          <div class="card-body text-center">
+        <div class="card text-white bg-success mb-3">
+          <div class="card-body">
             <h5 class="card-title">Total Passengers</h5>
-            <p id="kpiPassengers" class="card-text display-4 mb-0">--</p>
+            <p id="kpiPassengers" class="card-text display-4">1,245</p>
           </div>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card text-white bg-info h-100">
-          <div class="card-body text-center">
+        <div class="card text-white bg-info mb-3">
+          <div class="card-body">
             <h5 class="card-title">Active Journeys</h5>
-            <p id="kpiJourneys" class="card-text display-4 mb-0">--</p>
+            <p id="kpiJourneys" class="card-text display-4">87</p>
           </div>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card text-white bg-warning h-100">
-          <div class="card-body text-center">
+        <div class="card text-white bg-warning mb-3">
+          <div class="card-body">
             <h5 class="card-title">Today's Revenue</h5>
-            <p id="kpiRevenue" class="card-text display-4 mb-0">--</p>
+            <p id="kpiRevenue" class="card-text display-4">৳24,580</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Additional KPIs (Backend: update values) -->
-    <div id="kpiExtras" class="row g-4 mt-3">
-      <div class="col-md-6">
-        <div class="card text-white bg-danger h-100">
-          <div class="card-body text-center">
+    <!-- Additional KPI cards -->
+    <div class="row">
+      <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3">
+          <div class="card-body">
             <h5 class="card-title">QR Violations Today</h5>
-            <p id="kpiViolations" class="card-text display-4 mb-0">--</p>
+            <p id="kpiViolations" class="card-text display-4">0</p>
           </div>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="card text-white bg-dark h-100">
-          <div class="card-body text-center">
+      <div class="col-md-3">
+        <div class="card text-white bg-dark mb-3">
+          <div class="card-body">
             <h5 class="card-title">Open Complaints</h5>
-            <p id="kpiComplaints" class="card-text display-4 mb-0">--</p>
+            <p id="kpiComplaints" class="card-text display-4">0</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-secondary mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Compliance Score</h5>
+            <p id="kpiScore" class="card-text display-4">--%</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Current Occupancy</h5>
+            <p class="mb-1"><span id="occupancyText">0/0</span> passengers</p>
+            <div class="progress">
+              <div id="occupancyBar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Revenue Chart (Backend: feed chartData) -->
-    <section id="chartSection" class="row mt-5">
+    <!-- Revenue Chart -->
+    <div class="row mt-4">
       <div class="col-12">
         <div class="card">
           <div class="card-header bg-secondary text-white">
@@ -118,11 +152,10 @@
           </div>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Tables Section (Backend: inject rows) -->
-    <section id="tablesSection" class="row mt-4 g-4">
-      <!-- Recent Transactions -->
+    <!-- Transactions Table -->
+    <div class="row mt-4">
       <div class="col-12">
         <div class="card">
           <div class="card-header">
@@ -131,15 +164,25 @@
           <div class="card-body p-0">
             <table id="transactionsTable" class="table mb-0">
               <thead>
-                <tr><th>Trip ID</th><th>Passenger</th><th>Distance (km)</th><th>Fare (BDT)</th><th>Timestamp</th></tr>
+                <tr>
+                  <th>Trip ID</th>
+                  <th>Passenger</th>
+                  <th>Distance (km)</th>
+                  <th>Fare (BDT)</th>
+                  <th>Timestamp</th>
+                </tr>
               </thead>
-              <tbody><!-- Backend populates transactions --></tbody>
+              <tbody>
+                <!-- populated dynamically -->
+              </tbody>
             </table>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Violations Log -->
+    <!-- Violations Log Table -->
+    <div class="row mt-4">
       <div class="col-12">
         <div class="card">
           <div class="card-header">
@@ -148,15 +191,24 @@
           <div class="card-body p-0">
             <table id="violationsTable" class="table mb-0">
               <thead>
-                <tr><th>Timestamp</th><th>Bus ID</th><th>Location</th><th>Type</th></tr>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Bus ID</th>
+                  <th>Location</th>
+                  <th>Type</th>
+                </tr>
               </thead>
-              <tbody><!-- Backend populates violations --></tbody>
+              <tbody>
+                <!-- populated dynamically -->
+              </tbody>
             </table>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Audit Findings -->
+    <!-- Audits Findings Table -->
+    <div class="row mt-4">
       <div class="col-12">
         <div class="card">
           <div class="card-header">
@@ -165,15 +217,25 @@
           <div class="card-body p-0">
             <table id="auditsTable" class="table mb-0">
               <thead>
-                <tr><th>Trip ID</th><th>Expected Fare (BDT)</th><th>Charged Fare (BDT)</th><th>Difference</th><th>Timestamp</th></tr>
+                <tr>
+                  <th>Trip ID</th>
+                  <th>Expected Fare (BDT)</th>
+                  <th>Charged Fare (BDT)</th>
+                  <th>Difference</th>
+                  <th>Timestamp</th>
+                </tr>
               </thead>
-              <tbody><!-- Backend populates audits --></tbody>
+              <tbody>
+                <!-- populated dynamically -->
+              </tbody>
             </table>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Complaints -->
+    <!-- Complaints Dashboard Table -->"
+    <div class="row mt-4 mb-5">
       <div class="col-12">
         <div class="card">
           <div class="card-header">
@@ -182,18 +244,27 @@
           <div class="card-body p-0">
             <table id="complaintsTable" class="table mb-0">
               <thead>
-                <tr><th>ID</th><th>Complaints</th><th>Status</th><th>Date</th></tr>
+                <tr>
+                  <th>ID</th>
+                  <th>Complaints</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
               </thead>
-              <tbody><!-- Backend populates complaints --></tbody>
+              <tbody>
+                <!-- populated dynamically -->
+              </tbody>
             </table>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+
   </div>
 
   <!-- Bootstrap Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Dashboard logic -->
   <script src="admin-dashboard.js"></script>
 </body>
 </html>
