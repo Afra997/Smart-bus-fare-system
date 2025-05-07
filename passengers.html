@@ -43,18 +43,26 @@
 
     <!-- Filters -->
     <div class="row mb-3">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <input type="search" id="passengerSearch" class="form-control" placeholder="Search by name or email">
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <select id="statusFilter" class="form-select">
           <option value="">All Statuses</option>
           <option value="active">Active</option>
           <option value="suspended">Suspended</option>
         </select>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <input type="date" id="registrationDateFilter" class="form-control">
+      </div>
+      <div class="col-md-3">
+        <select id="violationTypeFilter" class="form-select">
+          <option value="">All Violation Types</option>
+          <option value="noScan">No QR Scan</option>
+          <option value="fakeScan">Fake QR Scan</option>
+          <option value="incorrectCode">Incorrect QR Code</option>
+        </select>
       </div>
       <div class="col-md-2">
         <button id="applyPassengerFilters" class="btn btn-secondary w-100">Apply</button>

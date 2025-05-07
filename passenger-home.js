@@ -1,117 +1,94 @@
-document.addEventListener('DOMContentLoaded', function () {
-    console.log("JS Loaded");
 
-    // 1. Get DOM elements
+// passenger-home.js (updated: fetch balance from backend)
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Check login status
+    if (!localStorage.getItem('isLoggedIn')) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    const balanceEl = document.getElementById('currentBalance');
+
+    // 1a. Fetch current balance from backend
+    fetch('/api/passenger/balance') // expects { balance: number }
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch balance');
+        return res.json();
+      })
+      .then(({ balance }) => {
+        balanceEl.textContent = parseFloat(balance).toFixed(2) + ' BDT';
+        // also store in localStorage if needed
+        localStorage.setItem('walletBalance', balance);
+      })
+      .catch(err => {
+        console.error(err);
+        // fallback to localStorage
+        const raw = localStorage.getItem('walletBalance');
+        const bal = raw ? parseFloat(raw) : 0.00;
+        balanceEl.textContent = bal.toFixed(2) + ' BDT';
+      });
+
+    // 2. QR Code System
     const qrCodeContainer = document.getElementById('qrCodeContainer');
     const journeyStatus = document.getElementById('journeyStatus');
+    let currentQRCode = null;
 
-    // 2. Store the original Generate QR button HTML
-    const originalGenerateBtnHTML = `
-        <button id="generateQRBtn" class="btn btn-primary btn-lg">
-            <i class="fas fa-qrcode me-2"></i> Generate QR Code
-        </button>
-    `;
-
-    // 3. Reset to initial state function
-    function resetToInitialState() {
-        qrCodeContainer.innerHTML = originalGenerateBtnHTML;
-        const generateQRBtn = document.getElementById('generateQRBtn');
-        if (generateQRBtn) {
-            generateQRBtn.addEventListener('click', generateQRCode);
-        }
-        journeyStatus.textContent = 'Press the button to start your journey';
-        journeyStatus.className = 'mt-3 text-muted';
-    }
-
-    // 4. Generate QR Code function
     function generateQRCode() {
-        // Clear container
         qrCodeContainer.innerHTML = '';
-
-        // Generate random journey ID
         const journeyId = 'JRN-' + Math.floor(100000 + Math.random() * 900000);
-        const userMobile = localStorage.getItem('userMobile') || '12345678';
-
-        // QR data
-        const qrData = JSON.stringify({
-            userId: userMobile,
-            journeyId: journeyId,
-            timestamp: new Date().toISOString()
-        });
-
-        // Create QR code
-        new QRCode(qrCodeContainer, {
-            text: qrData,
-            width: 200,
-            height: 200,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-
-        // Add End Journey button
-        const endJourneyBtn = document.createElement('button');
-        endJourneyBtn.id = 'endJourneyBtn';
-        endJourneyBtn.className = 'btn btn-danger btn-lg mt-3';
-        endJourneyBtn.innerHTML = '<i class="fas fa-stop-circle me-2"></i> End Journey';
-        endJourneyBtn.addEventListener('click', endJourney);
-
-        qrCodeContainer.appendChild(endJourneyBtn);
-
-        // Update journey status
-        journeyStatus.textContent = 'Journey started. Show QR to driver.';
+        const userMobile = localStorage.getItem('userMobile') || '';
+        const qrData = JSON.stringify({ userId: userMobile, journeyId, timestamp: new Date().toISOString() });
+        currentQRCode = new QRCode(qrCodeContainer, { text: qrData, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.H });
+        journeyStatus.textContent = 'Journey started. Show this QR code to the driver.';
         journeyStatus.className = 'mt-3 text-success';
+        const endBtn = document.createElement('button');
+        endBtn.id = 'endJourneyBtn'; endBtn.className = 'btn btn-danger btn-lg mt-3';
+        endBtn.innerHTML = '<i class="fas fa-stop-circle me-2"></i> End Journey';
+        endBtn.addEventListener('click', endJourney);
+        qrCodeContainer.appendChild(endBtn);
     }
 
-    // 5. End Journey function
     function endJourney() {
-        resetToInitialState();
-        journeyStatus.textContent = 'Journey completed. Fare deducted.';
+        qrCodeContainer.innerHTML = '';
+        const genBtn = document.createElement('button');
+        genBtn.id = 'generateQRBtn'; genBtn.className = 'btn btn-primary btn-lg';
+        genBtn.innerHTML = '<i class="fas fa-qrcode me-2"></i> Generate New QR';
+        genBtn.addEventListener('click', generateQRCode);
+        qrCodeContainer.appendChild(genBtn);
+        journeyStatus.textContent = 'Journey completed - fare deducted';
         journeyStatus.className = 'mt-3 text-primary';
     }
 
-    // 6. Initialize the page
-    resetToInitialState();
+    document.getElementById('generateQRBtn').addEventListener('click', generateQRCode);
 
-    // 7. Chat System
+    // 3. Chat System
     const chatInput = document.getElementById('chatInput');
     const sendChatBtn = document.getElementById('sendChatBtn');
     const chatMessages = document.getElementById('chatMessages');
 
-    function sendMessage() {
-        const message = chatInput.value.trim();
-        if (message) {
-            addMessage(message, 'sent');
-            chatInput.value = '';
-
-            setTimeout(() => {
-                const replies = [
-                    "How can I assist you further?",
-                    "Your issue has been noted.",
-                    "Thank you for your message!",
-                    "For immediate help, call 12345."
-                ];
-                const randomReply = replies[Math.floor(Math.random() * replies.length)];
-                addMessage(randomReply, 'received');
-            }, 1000);
-        }
-    }
-
     function addMessage(text, type) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${type}`;
-        messageDiv.innerHTML = `<p>${text}</p>`;
-        chatMessages.appendChild(messageDiv);
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${type}`;
+        msgDiv.innerHTML = `<p>${text}</p>`;
+        chatMessages.appendChild(msgDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    sendChatBtn.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') sendMessage();
-    });
+    function sendMessage() {
+        const msg = chatInput.value.trim(); if (!msg) return;
+        addMessage(msg, 'sent'); chatInput.value = '';
+        setTimeout(() => {
+            const replies = ["How can I assist you?","Your issue has been noted.","Thank you!","Call 12345 for help."];
+            addMessage(replies[Math.floor(Math.random()*replies.length)], 'received');
+        }, 1000);
+    }
 
-    // 8. Logout
-    document.getElementById('logoutBtn').addEventListener('click', function () {
+    sendChatBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', e => e.key==='Enter' && sendMessage());
+
+    // 4. Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
         localStorage.removeItem('isLoggedIn');
         window.location.href = 'index.html';
     });
